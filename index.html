@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vidhan Sai — Visual Artist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --border: #1e1e1e;
+      --text: #f0ece4;
+      --muted: #5a5550;
+      --accent: #c9a96e;
+      --accent-dim: rgba(201,169,110,0.12);
+      --accent-glow: rgba(201,169,110,0.06);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      background:var(--bg); color:var(--text);
+      font-family:'Syne',sans-serif; font-size:15px; line-height:1.6;
+      overflow-x:hidden; cursor:none;
+    }
+
+    /* CURSOR */
+    .cursor {
+      position:fixed; width:8px; height:8px; background:var(--accent);
+      border-radius:50%; pointer-events:none; z-index:9999;
+      transform:translate(-50%,-50%); mix-blend-mode:screen;
+      transition:width .25s ease, height .25s ease, background .25s ease;
+    }
+    .cursor.expanded { width:44px; height:44px; background:rgba(201,169,110,0.15); }
+    .cursor-ring {
+      position:fixed; width:36px; height:36px;
+      border:1px solid rgba(201,169,110,0.35); border-radius:50%;
+      pointer-events:none; z-index:9998; transform:translate(-50%,-50%);
+    }
+    .spark {
+      position:fixed; width:3px; height:3px; border-radius:50%;
+      pointer-events:none; z-index:9997; background:var(--accent);
+      animation:sparkFade .6s ease forwards;
+    }
+    @keyframes sparkFade {
+      0%   { transform:translate(-50%,-50%) scale(1); opacity:.8; }
+      100% { transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0); opacity:0; }
+    }
+
+    /* GRAIN */
+    body::before {
+      content:''; position:fixed; inset:0; pointer-events:none; z-index:9000; opacity:.5;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    }
+
+    /* READ PROGRESS */
+    #readProgress {
+      position:fixed; top:0; left:0; height:2px; background:var(--accent);
+      z-index:9999; width:0%; box-shadow:0 0 10px var(--accent); transition:width .1s linear;
+    }
+
+    /* NAV */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      padding:28px 56px; display:flex; justify-content:space-between; align-items:center;
+      backdrop-filter:blur(12px); background:rgba(10,10,10,0.7);
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      transition:padding .4s ease;
+    }
+    nav.scrolled { padding:16px 56px; }
+    .nav-logo {
+      font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:300;
+      letter-spacing:.08em; color:var(--text); text-decoration:none;
+    }
+    .nav-logo span { color:var(--accent); font-style:italic; }
+    .nav-links { display:flex; gap:40px; list-style:none; }
+    .nav-links a {
+      color:var(--muted); text-decoration:none; font-size:12px; letter-spacing:.16em;
+      text-transform:uppercase; font-weight:600; transition:color .3s ease; position:relative;
+    }
+    .nav-links a::after {
+      content:''; position:absolute; bottom:-4px; left:0; width:0; height:1px;
+      background:var(--accent); transition:width .3s ease;
+    }
+    .nav-links a:hover { color:var(--accent); }
+    .nav-links a:hover::after { width:100%; }
+    .nav-cta {
+      font-size:11px; letter-spacing:.18em; text-transform:uppercase; font-weight:700;
+      color:var(--accent); border:1px solid rgba(201,169,110,0.3); padding:10px 24px;
+      text-decoration:none; transition:all .3s ease; background:transparent; position:relative; overflow:hidden;
+    }
+    .nav-cta::before {
+      content:''; position:absolute; inset:0; background:var(--accent);
+      transform:translateX(-105%); transition:transform .35s ease; z-index:0;
+    }
+    .nav-cta:hover::before { transform:translateX(0); }
+    .nav-cta > span { position:relative; z-index:1; transition:color .35s ease; }
+    .nav-cta:hover > span { color:var(--bg); }
+
+    /* HERO */
+    .hero {
+      min-height:100vh; display:flex; flex-direction:column;
+      justify-content:flex-end; padding:0 56px 80px;
+      position:relative; overflow:hidden;
+    }
+    #heroCanvas { position:absolute; inset:0; pointer-events:none; z-index:0; }
+    .hero-bg {
+      position:absolute; inset:0; z-index:0;
+      background:
+        radial-gradient(ellipse 70% 60% at 75% 40%, rgba(201,169,110,0.05) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 50% at 20% 80%, rgba(201,169,110,0.03) 0%, transparent 60%);
+    }
+    .hero-line {
+      position:absolute; top:0; left:56px; width:1px; height:100%; z-index:1;
+      background:linear-gradient(to bottom, transparent, rgba(201,169,110,0.2) 40%, rgba(201,169,110,0.2) 60%, transparent);
+    }
+    .hero-number {
+      position:absolute; right:56px; top:50%; transform:translateY(-50%);
+      writing-mode:vertical-rl; font-family:'Cormorant Garamond',serif; font-size:200px;
+      font-weight:300; color:rgba(255,255,255,0.025); letter-spacing:-0.04em;
+      user-select:none; line-height:1; z-index:1;
+    }
+    .hero-content { position:relative; z-index:2; }
+    .hero-tag {
+      font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent);
+      font-weight:600; margin-bottom:32px; display:flex; align-items:center; gap:16px;
+      opacity:0; animation:fadeUp .9s ease .3s forwards;
+    }
+    .hero-tag::before { content:''; width:40px; height:1px; background:var(--accent); }
+    .hero-name {
+      font-family:'Cormorant Garamond',serif; font-size:clamp(72px,10vw,140px); font-weight:300;
+      line-height:.95; letter-spacing:-0.02em; margin-bottom:12px;
+      opacity:0; animation:fadeUp 1s ease .5s forwards;
+    }
+    .hero-name .italic { font-style:italic; color:var(--accent); }
+    .hero-sub {
+      font-family:'Cormorant Garamond',serif; font-size:clamp(22px,3vw,36px); font-weight:300;
+      font-style:italic; color:var(--muted); margin-bottom:56px;
+      opacity:0; animation:fadeUp 1s ease .7s forwards; letter-spacing:.02em;
+    }
+    .hero-bottom {
+      display:flex; justify-content:space-between; align-items:flex-end;
+      opacity:0; animation:fadeUp 1s ease .9s forwards;
+    }
+    .hero-desc { max-width:380px; font-size:14px; color:var(--muted); line-height:1.8; letter-spacing:.03em; }
+    .hero-scroll {
+      display:flex; flex-direction:column; align-items:center; gap:12px;
+      color:var(--muted); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+    }
+    .scroll-line {
+      width:1px; height:60px;
+      background:linear-gradient(to bottom, var(--accent), transparent);
+      animation:scrollPulse 2s ease-in-out infinite;
+    }
+
+    /* MARQUEE */
+    .marquee-section {
+      border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+      padding:20px 0; overflow:hidden; background:var(--surface);
+    }
+    .marquee-section:hover .marquee-track { animation-play-state:paused; }
+    .marquee-track { display:flex; gap:60px; animation:marquee 22s linear infinite; width:max-content; }
+    .marquee-item {
+      display:flex; align-items:center; gap:24px; font-size:11px; letter-spacing:.22em;
+      text-transform:uppercase; color:var(--muted); font-weight:600; white-space:nowrap;
+      transition:color .3s ease;
+    }
+    .marquee-item:hover { color:var(--accent); }
+    .marquee-dot { width:4px; height:4px; border-radius:50%; background:var(--accent); flex-shrink:0; }
+
+    /* SECTIONS */
+    section { padding:120px 56px; }
+    .section-label {
+      display:flex; align-items:center; gap:16px; font-size:10px; letter-spacing:.26em;
+      text-transform:uppercase; color:var(--accent); font-weight:700; margin-bottom:64px;
+    }
+    .section-label::after { content:''; flex:1; height:1px; background:var(--border); max-width:120px; }
+
+    /* ABOUT */
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; }
+    .about-heading {
+      font-family:'Cormorant Garamond',serif; font-size:clamp(42px,5vw,72px);
+      font-weight:300; line-height:1.1; letter-spacing:-0.01em;
+    }
+    .about-heading em { font-style:italic; color:var(--accent); }
+    .about-right { padding-top:12px; }
+    .about-text { font-size:15px; color:var(--muted); line-height:1.9; margin-bottom:32px; letter-spacing:.02em; }
+    .about-stats {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:32px;
+      margin-top:48px; padding-top:48px; border-top:1px solid var(--border);
+    }
+    .stat-num {
+      font-family:'Cormorant Garamond',serif; font-size:52px; font-weight:300;
+      color:var(--text); line-height:1; letter-spacing:-0.02em;
+    }
+    .stat-label { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-top:8px; font-weight:600; }
+
+    /* SKILLS */
+    .skills-section { background:var(--surface); }
+    .skills-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2px; }
+    .skill-card {
+      background:var(--bg); padding:48px 40px; position:relative; overflow:hidden;
+      transition:background .4s ease; cursor:none;
+    }
+    .skill-card::before {
+      content:''; position:absolute; bottom:0; left:0; width:100%; height:2px;
+      background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform .4s ease;
+    }
+    .skill-card:hover::before { transform:scaleX(1); }
+    .skill-card:hover { background:#121212; }
+    .skill-card::after {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(201,169,110,0.07) 0%, transparent 55%);
+      opacity:0; transition:opacity .4s ease; pointer-events:none;
+    }
+    .skill-card:hover::after { opacity:1; }
+    .skill-icon {
+      width:48px; height:48px; border:1px solid var(--border); display:flex;
+      align-items:center; justify-content:center; margin-bottom:32px; font-size:20px;
+      transition:border-color .3s ease, transform .4s ease;
+    }
+    .skill-card:hover .skill-icon { border-color:var(--accent); transform:rotate(15deg) scale(1.1); }
+    .skill-name { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:300; margin-bottom:16px; letter-spacing:-0.01em; }
+    .skill-desc { font-size:13px; color:var(--muted); line-height:1.8; letter-spacing:.02em; }
+    .skill-tools { margin-top:28px; display:flex; flex-wrap:wrap; gap:8px; }
+    .tool-tag {
+      font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+      border:1px solid var(--border); padding:5px 10px; font-weight:600; transition:all .3s ease;
+    }
+    .skill-card:hover .tool-tag { border-color:rgba(201,169,110,0.3); color:rgba(201,169,110,0.6); }
+
+    /* WORK */
+    .work-intro { display:grid; grid-template-columns:1fr 1fr; gap:40px; margin-bottom:80px; align-items:end; }
+    .work-heading {
+      font-family:'Cormorant Garamond',serif; font-size:clamp(42px,5vw,72px);
+      font-weight:300; line-height:1.1; letter-spacing:-0.01em;
+    }
+    .work-heading em { font-style:italic; color:var(--accent); }
+    .work-desc { font-size:14px; color:var(--muted); line-height:1.8; letter-spacing:.02em; max-width:400px; align-self:flex-end; }
+    .projects-list { display:flex; flex-direction:column; gap:2px; }
+    .project-item {
+      display:grid; grid-template-columns:80px 1fr auto; gap:40px; padding:40px;
+      background:var(--surface); align-items:center; border:1px solid transparent;
+      transition:border-color .35s ease, transform .35s ease; cursor:none; position:relative; overflow:hidden;
+    }
+    .project-item-glow {
+      position:absolute; inset:0; background:var(--accent-glow);
+      opacity:0; transition:opacity .35s ease; pointer-events:none; z-index:0;
+    }
+    .project-item::before {
+      content:''; position:absolute; left:0; top:0; width:3px; height:100%;
+      background:var(--accent); transform:scaleY(0); transform-origin:top;
+      transition:transform .35s ease; z-index:2;
+    }
+    .project-item:hover::before { transform:scaleY(1); }
+    .project-item:hover { border-color:rgba(201,169,110,0.15); transform:translateX(10px); }
+    .project-item:hover .project-item-glow { opacity:1; }
+    .project-num {
+      font-family:'Cormorant Garamond',serif; font-size:42px; font-weight:300;
+      color:var(--border); line-height:1; letter-spacing:-0.02em; transition:color .3s ease; z-index:1;
+    }
+    .project-item:hover .project-num { color:var(--accent); }
+    .project-info { z-index:1; }
+    .project-title {
+      font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:400;
+      letter-spacing:-0.01em; margin-bottom:8px; transition:color .3s ease;
+    }
+    .project-meta { font-size:11px; color:var(--muted); letter-spacing:.16em; text-transform:uppercase; font-weight:600; }
+    .project-tags { display:flex; gap:8px; z-index:1; }
+    .project-tag {
+      font-size:9px; letter-spacing:.14em; text-transform:uppercase; padding:6px 14px;
+      border:1px solid var(--border); color:var(--muted); font-weight:600; transition:all .3s ease;
+    }
+    .project-item:hover .project-tag { border-color:rgba(201,169,110,0.3); color:var(--accent); }
+
+    /* PROCESS */
+    .process-section { background:var(--surface); }
+    .process-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:64px; }
+    .process-step {
+      background:var(--bg); padding:48px 36px; position:relative;
+      transition:transform .3s ease;
+    }
+    .process-step:hover { transform:translateY(-6px); }
+    .step-number {
+      font-family:'Cormorant Garamond',serif; font-size:80px; font-weight:300;
+      color:rgba(255,255,255,0.03); line-height:1; letter-spacing:-0.04em; margin-bottom:32px;
+    }
+    .step-title { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:400; margin-bottom:16px; }
+    .step-desc { font-size:13px; color:var(--muted); line-height:1.8; letter-spacing:.02em; }
+    .step-accent { width:32px; height:2px; background:var(--accent); margin-bottom:24px; }
+
+    /* CONTACT */
+    .contact-inner { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; }
+    .contact-heading {
+      font-family:'Cormorant Garamond',serif; font-size:clamp(52px,6vw,90px);
+      font-weight:300; line-height:1; letter-spacing:-0.02em; margin-bottom:32px;
+    }
+    .contact-heading em { font-style:italic; color:var(--accent); display:block; }
+    .contact-tagline { font-size:14px; color:var(--muted); line-height:1.8; letter-spacing:.02em; max-width:360px; margin-bottom:48px; }
+    .contact-links { display:flex; flex-direction:column; gap:16px; }
+    .contact-link {
+      display:flex; align-items:center; gap:16px; text-decoration:none; color:var(--text);
+      font-size:13px; letter-spacing:.06em; padding:20px 0; border-bottom:1px solid var(--border);
+      transition:all .3s ease; cursor:none;
+    }
+    .contact-link:hover { color:var(--accent); padding-left:16px; }
+    .contact-link-icon {
+      width:32px; height:32px; border:1px solid var(--border); display:flex;
+      align-items:center; justify-content:center; font-size:14px; flex-shrink:0;
+      transition:all .3s ease;
+    }
+    .contact-link:hover .contact-link-icon { border-color:var(--accent); background:var(--accent-dim); }
+    .contact-link-label { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); font-weight:600; margin-bottom:2px; }
+    .contact-form-side { padding-top:8px; }
+    .form-group { margin-bottom:24px; }
+    .form-label { font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); font-weight:700; display:block; margin-bottom:10px; }
+    .form-input, .form-textarea {
+      width:100%; background:var(--surface); border:1px solid var(--border); color:var(--text);
+      font-family:'Syne',sans-serif; font-size:14px; padding:16px 20px; outline:none;
+      transition:border-color .3s ease; resize:none; letter-spacing:.02em;
+    }
+    .form-input:focus, .form-textarea:focus { border-color:rgba(201,169,110,0.5); }
+    .form-textarea { height:140px; }
+    .form-input::placeholder, .form-textarea::placeholder { color:var(--muted); opacity:.5; }
+    .btn-submit {
+      display:inline-flex; align-items:center; gap:16px; background:var(--accent); color:var(--bg);
+      font-family:'Syne',sans-serif; font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+      font-weight:700; border:none; padding:18px 36px; cursor:none; transition:all .3s ease;
+      width:100%; justify-content:center; margin-top:8px;
+    }
+    .btn-submit:hover { background:#d4b47a; }
+    .btn-arrow { font-size:16px; transition:transform .3s ease; }
+    .btn-submit:hover .btn-arrow { transform:translateX(6px); }
+
+    footer {
+      border-top:1px solid var(--border); padding:32px 56px; display:flex;
+      justify-content:space-between; align-items:center; background:var(--surface);
+    }
+    .footer-logo { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:300; letter-spacing:.06em; }
+    .footer-logo span { color:var(--accent); font-style:italic; }
+    .footer-copy { font-size:11px; color:var(--muted); letter-spacing:.12em; }
+    .footer-socials { display:flex; gap:24px; }
+    .footer-social {
+      font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+      text-decoration:none; transition:color .3s ease; font-weight:600;
+    }
+    .footer-social:hover { color:var(--accent); }
+
+    .divider { height:1px; background:var(--border); margin:0 56px; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(30px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes scrollPulse {
+      0%,100% { opacity:.4; } 50% { opacity:1; }
+    }
+    @keyframes marquee {
+      from { transform:translateX(0); } to { transform:translateX(-50%); }
+    }
+
+    .reveal { opacity:0; transform:translateY(40px); transition:opacity .8s ease, transform .8s ease; }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-delay-1 { transition-delay:.12s; }
+    .reveal-delay-2 { transition-delay:.24s; }
+    .reveal-delay-3 { transition-delay:.36s; }
+    .reveal-delay-4 { transition-delay:.48s; }
+  </style>
+</head>
+<body>
+
+<div id="readProgress"></div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav id="mainNav">
+  <a href="#" class="nav-logo">Vidhan <span>Sai</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta magnetic"><span>Hire Me</span></a>
+</nav>
+
+<section class="hero" id="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-bg"></div>
+  <div class="hero-line"></div>
+  <div class="hero-number" id="heroNumber">VS</div>
+  <div class="hero-content">
+    <div class="hero-tag">Visual Storyteller &amp; Motion Artist</div>
+    <h1 class="hero-name">Vidhan<br><span class="italic">Sai</span></h1>
+    <p class="hero-sub">Crafting motion. Shaping narratives.</p>
+    <div class="hero-bottom">
+      <p class="hero-desc" id="heroDesc">A Hyderabad-based visual artist specialising in video editing and motion graphics — blending technical precision with creative vision to produce work that resonates.</p>
+      <div class="hero-scroll">
+        <div class="scroll-line"></div>
+        <span>Scroll</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-section">
+  <div class="marquee-track">
+    <div class="marquee-item"><div class="marquee-dot"></div>Video Editing</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Motion Graphics</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Visual Effects</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Color Grading</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Brand Films</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Title Sequences</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>2D Animation</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Sound Design</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Video Editing</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Motion Graphics</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Visual Effects</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Color Grading</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Brand Films</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Title Sequences</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>2D Animation</div>
+    <div class="marquee-item"><div class="marquee-dot"></div>Sound Design</div>
+  </div>
+</div>
+
+<section id="about">
+  <div class="section-label">About</div>
+  <div class="about-grid">
+    <div class="about-left reveal">
+      <h2 class="about-heading scramble-target">Telling stories<br>through <em>motion</em><br>&amp; light</h2>
+    </div>
+    <div class="about-right reveal reveal-delay-2">
+      <p class="about-text">I'm Vidhan Sai — a visual artist based in Hyderabad with a deep passion for the art of moving images. I believe that great video work isn't just technically flawless — it carries an emotional weight, a rhythm, a heartbeat.</p>
+      <p class="about-text">From short-form social content to long-form documentary edits and branded motion graphics, I bring intentionality to every frame. My work lives at the intersection of craft, storytelling, and visual design.</p>
+      <div class="about-stats">
+        <div class="stat"><div class="stat-num count-up" data-target="4" data-suffix="+">0</div><div class="stat-label">Years Experience</div></div>
+        <div class="stat"><div class="stat-num count-up" data-target="23" data-suffix="+">0</div><div class="stat-label">Projects Completed</div></div>
+        <div class="stat"><div class="stat-num count-up" data-target="7" data-suffix="+">0</div><div class="stat-label">Happy Clients</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section id="skills" class="skills-section">
+  <div class="section-label">Expertise</div>
+  <div class="skills-grid">
+    <div class="skill-card reveal"><div class="skill-icon">✦</div><div class="skill-name">Video Editing</div><p class="skill-desc">Precision-cut sequences that keep audiences locked in — from pacing and rhythm to narrative structure and emotional arc.</p><div class="skill-tools"><span class="tool-tag">Premiere Pro</span><span class="tool-tag">DaVinci Resolve</span></div></div>
+    <div class="skill-card reveal reveal-delay-1"><div class="skill-icon">◈</div><div class="skill-name">Motion Graphics</div><p class="skill-desc">Dynamic visual elements and animated graphics that breathe life into brands, interfaces, and storytelling.</p><div class="skill-tools"><span class="tool-tag">After Effects</span><span class="tool-tag">Fusion</span></div></div>
+    <div class="skill-card reveal reveal-delay-2"><div class="skill-icon">⬡</div><div class="skill-name">Color Grading</div><p class="skill-desc">Cinematic color work that sets the mood — from natural grades for documentary to stylised looks for commercial work.</p><div class="skill-tools"><span class="tool-tag">DaVinci Resolve</span><span class="tool-tag">Lumetri</span><span class="tool-tag">LUT Design</span></div></div>
+    <div class="skill-card reveal reveal-delay-1"><div class="skill-icon">◎</div><div class="skill-name">Visual Effects</div><p class="skill-desc">Compositing, tracking, and VFX integration that seamlessly blends digital elements with live footage.</p><div class="skill-tools"><span class="tool-tag">After Effects</span><span class="tool-tag">Fusion</span></div></div>
+    <div class="skill-card reveal reveal-delay-2"><div class="skill-icon">▷</div><div class="skill-name">Brand Films</div><p class="skill-desc">High-concept brand stories and commercials — from script to screen, crafted to resonate with audiences and drive results.</p><div class="skill-tools"><span class="tool-tag">Pre-production</span><span class="tool-tag">Direction</span><span class="tool-tag">Post</span></div></div>
+    <div class="skill-card reveal reveal-delay-3"><div class="skill-icon">♩</div><div class="skill-name">Sound Design</div><p class="skill-desc">Sonic landscapes that elevate the visual — thoughtful audio editing, sound mixing and music supervision.</p><div class="skill-tools"><span class="tool-tag">Audition</span><span class="tool-tag">Logic Pro</span><span class="tool-tag">Fairlight</span></div></div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="section-label">Selected Work</div>
+  <div class="work-intro">
+    <h2 class="work-heading reveal scramble-target">Projects that<br><em>speak</em> for<br>themselves</h2>
+    <p class="work-desc reveal reveal-delay-2">A curated selection of recent work across brand films, social content, motion design, and narrative editing.</p>
+  </div>
+  <div class="projects-list">
+    <div class="project-item reveal"><div class="project-item-glow"></div><div class="project-num">01</div><div class="project-info"><div class="project-title">Luminary Brand Film</div><div class="project-meta">Brand Film · 2024</div></div><div class="project-tags"><span class="project-tag">Video Editing</span><span class="project-tag">Color Grading</span></div></div>
+    <div class="project-item reveal reveal-delay-1"><div class="project-item-glow"></div><div class="project-num">02</div><div class="project-info"><div class="project-title">Nexa — Product Launch</div><div class="project-meta">Motion Graphics · 2024</div></div><div class="project-tags"><span class="project-tag">Motion Design</span><span class="project-tag">VFX</span></div></div>
+    <div class="project-item reveal reveal-delay-2"><div class="project-item-glow"></div><div class="project-num">03</div><div class="project-info"><div class="project-title">Echoes — Short Documentary</div><div class="project-meta">Documentary · 2023</div></div><div class="project-tags"><span class="project-tag">Editing</span><span class="project-tag">Sound Design</span></div></div>
+    <div class="project-item reveal reveal-delay-3"><div class="project-item-glow"></div><div class="project-num">04</div><div class="project-info"><div class="project-title">Vibe Social Campaign</div><div class="project-meta">Social Media · 2023</div></div><div class="project-tags"><span class="project-tag">Short-form</span><span class="project-tag">Motion Graphics</span></div></div>
+    <div class="project-item reveal"><div class="project-item-glow"></div><div class="project-num">05</div><div class="project-info"><div class="project-title">Prism — Title Sequence</div><div class="project-meta">Title Design · 2023</div></div><div class="project-tags"><span class="project-tag">Motion Design</span><span class="project-tag">Typography</span></div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="process-section">
+  <div class="section-label">Process</div>
+  <h2 class="about-heading reveal scramble-target" style="max-width:560px;">How great work <em>gets made</em></h2>
+  <div class="process-steps">
+    <div class="process-step reveal"><div class="step-number">01</div><div class="step-accent"></div><div class="step-title">Discovery</div><p class="step-desc">Understanding your vision, audience, and objectives before a single frame is touched. Good briefs make great films.</p></div>
+    <div class="process-step reveal reveal-delay-1"><div class="step-number">02</div><div class="step-accent"></div><div class="step-title">Concept</div><p class="step-desc">Translating the brief into a visual language — mood boards, styleframes, and a clear creative direction.</p></div>
+    <div class="process-step reveal reveal-delay-2"><div class="step-number">03</div><div class="step-accent"></div><div class="step-title">Creation</div><p class="step-desc">Editing, animating, grading and compositing with precision. Iterating until every element earns its place.</p></div>
+    <div class="process-step reveal reveal-delay-3"><div class="step-number">04</div><div class="step-accent"></div><div class="step-title">Delivery</div><p class="step-desc">Clean deliverables across all required formats, on time, with full revision rounds and post-delivery support.</p></div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="section-label">Contact</div>
+  <div class="contact-inner">
+    <div class="contact-left reveal">
+      <h2 class="contact-heading">Let's make<br>something<br><em>memorable.</em></h2>
+      <p class="contact-tagline">Whether you have a detailed brief or just a rough idea — I'd love to hear about your project and explore how we can work together.</p>
+      <div class="contact-links">
+        <a href="mailto:vidhansona8074@gmail.com" class="contact-link"><div class="contact-link-icon">@</div><div><div class="contact-link-label">Email</div><div>vidhansona8074@gmail.com</div></div></a>
+        <a href="https://www.youtube.com/@Sona_Edits" class="contact-link" target="_blank"><div class="contact-link-icon">▶</div><div><div class="contact-link-label">YouTube</div><div>@Sona_Edits</div></div></a>
+        <a href="https://www.upwork.com/freelancers/~019aa5c3b89fcde105?mp_source=share" class="contact-link" target="_blank"><div class="contact-link-icon">up</div><div><div class="contact-link-label">Upwork</div><div>upwork.com/up/vidhansai</div></div></a>
+      </div>
+    </div>
+    <div class="contact-form-side reveal reveal-delay-2">
+      <form id="contactForm">
+        <div class="form-group"><label class="form-label">Your Name</label><input type="text" name="name" class="form-input" placeholder="Name" required></div>
+        <div class="form-group"><label class="form-label">Email Address</label><input type="email" name="email" class="form-input" placeholder="you@example.com" required></div>
+        <div class="form-group"><label class="form-label">Project Type</label><input type="text" name="project" class="form-input" placeholder="Brand Film, Motion Graphics, etc."></div>
+        <div class="form-group"><label class="form-label">Tell Me About Your Project</label><textarea name="message" class="form-textarea" placeholder="Describe your vision, timeline, and any specifics…" required></textarea></div>
+        <button type="submit" class="btn-submit magnetic">Send Message <span class="btn-arrow">→</span></button>
+        <p id="formStatus" style="margin-top:16px;color:var(--accent);font-size:13px;letter-spacing:.06em;"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">Vidhan <span>Sai</span></div>
+  <div class="footer-copy">© 2025 Vidhan Sai. All rights reserved.</div>
+  <div class="footer-socials">
+    <a href="#" class="footer-social">Instagram</a>
+    <a href="#" class="footer-social">Behance</a>
+    <a href="https://www.upwork.com/freelancers/~019aa5c3b89fcde105?mp_source=share" class="footer-social" target="_blank">Upwork</a>
+    <a href="https://www.youtube.com/@Sona_Edits" class="footer-social" target="_blank">YouTube</a>
+  </div>
+</footer>
+
+<script>
+/* ── 1. CURSOR + SPARKS ── */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0,sparkTick=0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx+'px'; cursor.style.top = my+'px';
+  sparkTick++;
+  if(sparkTick % 6 === 0) emitSpark(mx,my);
+});
+
+function emitSpark(x,y){
+  const s = document.createElement('div');
+  s.className = 'spark';
+  const dx=(Math.random()-.5)*70, dy=(Math.random()-.5)*70;
+  s.style.cssText=`left:${x}px;top:${y}px;--dx:${dx}px;--dy:${dy}px;width:${Math.random()*3+1}px;height:${Math.random()*3+1}px;opacity:${Math.random()*.7+.2};`;
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),650);
+}
+
+(function loopRing(){
+  rx+=(mx-rx)*.1; ry+=(my-ry)*.1;
+  ring.style.left=rx+'px'; ring.style.top=ry+'px';
+  requestAnimationFrame(loopRing);
+})();
+
+document.querySelectorAll('a,button,.skill-card,.project-item,.process-step').forEach(el=>{
+  el.addEventListener('mouseenter',()=>cursor.classList.add('expanded'));
+  el.addEventListener('mouseleave',()=>cursor.classList.remove('expanded'));
+});
+
+
+/* ── 2. HERO PARTICLE CANVAS ── */
+(function(){
+  const canvas=document.getElementById('heroCanvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,pts=[];
+
+  function resize(){ W=canvas.width=canvas.offsetWidth; H=canvas.height=canvas.offsetHeight; }
+  window.addEventListener('resize',resize); resize();
+
+  class Pt {
+    constructor(){ this.init(); }
+    init(){
+      this.x=Math.random()*W; this.y=Math.random()*H;
+      this.vx=(Math.random()-.5)*.25; this.vy=(Math.random()-.5)*.25-.08;
+      this.r=Math.random()*1.4+.3;
+      this.maxAge=Math.random()*350+150; this.age=Math.random()*this.maxAge;
+    }
+    step(){
+      // gentle mouse pull
+      const ddx=mox-this.x, ddy=moy-this.y;
+      const dist=Math.sqrt(ddx*ddx+ddy*ddy);
+      if(dist<220){ this.vx+=ddx/dist*.007; this.vy+=ddy/dist*.007; }
+      this.vx*=.99; this.vy*=.99;
+      this.x+=this.vx; this.y+=this.vy; this.age++;
+      if(this.age>this.maxAge||this.x<0||this.x>W||this.y<0) this.init();
+    }
+    draw(){
+      const t=this.age/this.maxAge;
+      const a=(t<.1?t*10:t>.9?(1-t)*10:1)*.4;
+      ctx.beginPath(); ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(201,169,110,${a})`; ctx.fill();
+    }
+  }
+
+  for(let i=0;i<140;i++) pts.push(new Pt());
+
+  let mox=W/2,moy=H/2;
+  document.addEventListener('mousemove',e=>{
+    const r=canvas.getBoundingClientRect();
+    mox=e.clientX-r.left; moy=e.clientY-r.top;
+  });
+
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    // connections
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<95){
+        ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(201,169,110,${(1-d/95)*.07})`; ctx.lineWidth=.5; ctx.stroke();
+      }
+    }
+    pts.forEach(p=>{ p.step(); p.draw(); });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+
+/* ── 3. SCROLL REVEAL ── */
+const revObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); revObs.unobserve(e.target); }});
+},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>revObs.observe(el));
+
+
+/* ── 4. TEXT SCRAMBLE ── */
+const GLYPHS='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%✦◈⬡◎▷♩';
+
+function scrambleEl(el){
+  const orig=el.innerHTML;
+  const text=el.innerText;
+  let f=0, total=20;
+  function tick(){
+    let out='', ti=0;
+    for(let ci=0;ci<orig.length;ci++){
+      if(orig[ci]==='<'){ // skip HTML tags
+        const end=orig.indexOf('>',ci); out+=orig.slice(ci,end+1); ci=end; continue;
+      }
+      const ch=orig[ci];
+      if(ch===' '||ch==='\n'||ch==='&'||ch===';'){ out+=ch; ti++; continue; }
+      if(f/total > ti/text.length) out+=ch;
+      else out+=GLYPHS[Math.floor(Math.random()*GLYPHS.length)];
+      ti++;
+    }
+    el.innerHTML=out;
+    f++;
+    if(f<=total) requestAnimationFrame(tick); else el.innerHTML=orig;
+  }
+  tick();
+}
+
+const scrObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ scrambleEl(e.target); scrObs.unobserve(e.target); }});
+},{threshold:.3});
+document.querySelectorAll('.scramble-target').forEach(el=>scrObs.observe(el));
+
+
+/* ── 5. COUNT-UP ── */
+function countUp(el){
+  const target=+el.dataset.target, suffix=el.dataset.suffix||'', dur=1800;
+  const t0=performance.now();
+  (function f(now){
+    const p=Math.min((now-t0)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.floor(ease*target)+suffix;
+    if(p<1) requestAnimationFrame(f);
+  })(t0);
+}
+const countObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting&&e.target.dataset.target){ countUp(e.target); countObs.unobserve(e.target); }});
+},{threshold:.5});
+document.querySelectorAll('.count-up').forEach(el=>countObs.observe(el));
+
+
+/* ── 6. MAGNETIC ELEMENTS ── */
+document.querySelectorAll('.magnetic').forEach(el=>{
+  el.addEventListener('mousemove',e=>{
+    const r=el.getBoundingClientRect();
+    const dx=(e.clientX-r.left-r.width/2)*.3;
+    const dy=(e.clientY-r.top-r.height/2)*.3;
+    el.style.transform=`translate(${dx}px,${dy}px)`;
+  });
+  el.addEventListener('mouseleave',()=>{ el.style.transform=''; });
+});
+
+
+/* ── 7. SKILL CARD 3D TILT + GLOW ── */
+document.querySelectorAll('.skill-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const r=card.getBoundingClientRect();
+    const x=(e.clientX-r.left)/r.width-.5;
+    const y=(e.clientY-r.top)/r.height-.5;
+    card.style.transform=`perspective(700px) rotateY(${x*9}deg) rotateX(${-y*9}deg) scale(1.02)`;
+    card.style.setProperty('--mx',`${e.clientX-r.left}px`);
+    card.style.setProperty('--my',`${e.clientY-r.top}px`);
+  });
+  card.addEventListener('mouseleave',()=>{ card.style.transform=''; });
+});
+
+
+/* ── 8. SCROLL EFFECTS ── */
+let ticking=false;
+window.addEventListener('scroll',()=>{
+  if(!ticking){ requestAnimationFrame(()=>{ onScroll(); ticking=false; }); ticking=true; }
+});
+
+function onScroll(){
+  const y=window.scrollY;
+
+  // Parallax hero elements
+  const hn=document.getElementById('heroNumber');
+  if(hn) hn.style.transform=`translateY(calc(-50% + ${y*.28}px))`;
+  const hd=document.getElementById('heroDesc');
+  if(hd) hd.style.transform=`translateY(${y*.08}px)`;
+
+  // Nav compact
+  document.getElementById('mainNav').classList.toggle('scrolled',y>80);
+
+  // Read progress bar
+  const total=document.body.scrollHeight-window.innerHeight;
+  document.getElementById('readProgress').style.width=(y/total*100)+'%';
+}
+
+
+/* ── 9. PROJECT SPOTLIGHT ── */
+document.querySelectorAll('.project-item').forEach(item=>{
+  item.addEventListener('mousemove',e=>{
+    const r=item.getBoundingClientRect();
+    const pct=((e.clientX-r.left)/r.width*100).toFixed(1);
+    item.style.background=`linear-gradient(90deg, var(--surface) 0%, #17140f ${pct}%, var(--surface) 100%)`;
+  });
+  item.addEventListener('mouseleave',()=>{ item.style.background=''; });
+});
+
+
+/* ── 10. FORM SUBMIT ── */
+const form=document.getElementById('contactForm');
+const status=document.getElementById('formStatus');
+form.addEventListener('submit',async e=>{
+  e.preventDefault(); status.textContent='Sending…';
+  try{
+    const res=await fetch('https://formspree.io/f/mbdwepzy',{
+      method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}
+    });
+    if(res.ok){ status.textContent='✓ Message sent.'; form.reset(); }
+    else status.textContent='⚠ Something went wrong.';
+  }catch{ status.textContent='⚠ Network error.'; }
+});
+</script>
+</body>
+</html>
