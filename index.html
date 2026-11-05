@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vidhan Sai – Video Editor & Motion Designer</title>
+<title>Vidhan Sai – Video Editor &amp; Motion Designer</title>
 <meta name="description" content="Video editor and motion designer in Hyderabad. Short-form, documentaries, brand films, color grading and thumbnails.">
 <!-- Share preview and search tags use the live site address -->
 <link rel="canonical" href="https://vidhansai.github.io/Portfolio/">
@@ -20,6 +20,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="theme-color" content="#0e0d0c">
+<meta name="color-scheme" content="dark">
+<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@400;500;600;700&display=swap">
@@ -58,7 +60,6 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
 /* hero */
 .hero{padding:170px 0 90px;position:relative;overflow:hidden}
 .hero h1{font-size:clamp(52px,8.5vw,112px);max-width:900px}
-.hero h1 em{color:var(--gold)}
 .hero .lead{margin:28px 0 36px;font-size:18px}
 .cta{display:flex;gap:14px;flex-wrap:wrap}
 .hero-meta{display:flex;gap:44px;flex-wrap:wrap;margin-top:64px;padding-top:28px;border-top:1px solid var(--line)}
@@ -85,14 +86,12 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:6
 
 /* work */
 .work{display:grid;grid-template-columns:repeat(6,1fr);gap:22px}
-.card{grid-column:span 2;background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:border-color .2s,transform .2s}
+.card{position:relative;grid-column:span 2;background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:border-color .2s,transform .2s}
 .card:hover{border-color:rgba(201,169,110,.5);transform:translateY(-3px)}
-.card.wide{grid-column:span 3}
 .thumb{aspect-ratio:16/9;position:relative;display:grid;place-items:center;background:linear-gradient(135deg,#25211a,#12100d)}
 .thumb::after{content:"";width:46px;height:46px;border-radius:50%;background:rgba(201,169,110,.15);border:1px solid var(--gold);position:absolute}
 .thumb::before{content:"";border-left:12px solid var(--gold);border-top:8px solid transparent;border-bottom:8px solid transparent;position:absolute;z-index:1;margin-left:4px}
-.thumb.img{background-size:cover;background-position:center}.thumb.img::before,.thumb.img::after{display:none}
-.t2{background:linear-gradient(135deg,#1c2227,#0f1214)}.t3{background:linear-gradient(135deg,#2a1f1f,#130e0e)}.t4{background:linear-gradient(135deg,#1f2a22,#0e1310)}.t5{background:linear-gradient(135deg,#221f2a,#100e14)}
+.thumb.img::before,.thumb.img::after{display:none}
 .info{padding:22px 24px 26px}
 .info h3{font-size:25px;margin-bottom:4px}
 .info p{font-size:13.5px;color:var(--mute)}
@@ -128,7 +127,7 @@ textarea{height:130px;resize:vertical}
 form .btn{width:100%}
 #st{margin-top:14px;font-size:14px;color:var(--gold);min-height:22px}
 
-footer{border-top:1px solid var(--line);padding:30px 0;font-size:13.5px;color:var(--mute)}
+footer{border-top:1px solid var(--line);padding:64px 0 28px;font-size:13.5px;color:var(--mute)}
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer a:hover{color:var(--gold)}
 
@@ -142,7 +141,8 @@ dialog::backdrop{background:rgba(0,0,0,.8);backdrop-filter:blur(4px)}
 .gal button{background:none;border:0;padding:0;cursor:zoom-in;border-radius:8px;overflow:hidden}
 .gal img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block;transition:transform .25s,border-color .2s}
 .gal button:hover img{transform:scale(1.03);border-color:var(--gold)}
-.viewer{position:relative;background:#000;border-radius:8px;overflow:hidden;touch-action:pan-y}
+.viewer{position:relative;background:#000;border-radius:8px;overflow:hidden;touch-action:pan-y pinch-zoom}
+.viewer:focus{outline:none}
 .viewer img{width:100%;height:auto;max-height:66vh;object-fit:contain;display:block;margin:0 auto}
 .vn{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.25);background:rgba(14,13,12,.7);color:var(--text);font-size:26px;line-height:1;cursor:pointer;backdrop-filter:blur(6px);transition:border-color .2s,color .2s}
 .vn:hover{border-color:var(--gold);color:var(--gold)}
@@ -192,14 +192,8 @@ dialog::backdrop{background:rgba(0,0,0,.8);backdrop-filter:blur(4px)}
 .bd.gold{color:var(--gold);border-color:rgba(201,169,110,.5)}
 .card[hidden]{display:none}
 .soon p{margin:0 auto 24px;max-width:420px}
-.mini{display:flex;gap:4px;height:26px;max-width:360px;margin:0 auto 26px}
-.mini i{border-radius:4px;background:var(--s2);border:1px solid var(--line);animation:pulse 2.4s ease-in-out infinite}
-.mini i.g{background:rgba(201,169,110,.2);border-color:rgba(201,169,110,.5)}
-@keyframes pulse{50%{opacity:.4}}
 .vc{display:inline-flex;align-items:center;gap:12px}
 .vbar .bn{display:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);font-size:22px;line-height:1;align-items:center;justify-content:center}
-.viewer{touch-action:pan-y pinch-zoom}.viewer:focus{outline:none}
-footer{padding:64px 0 28px}
 footer .fgrid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:48px;align-items:start}
 footer .fgrid p{max-width:340px;margin-top:10px}
 footer .fl b{display:block;color:var(--text);font-size:13.5px;margin-bottom:12px}
@@ -234,6 +228,8 @@ select option{background:#161513;color:#f2eee6}
 .phone{position:relative;height:min(560px,62vh);aspect-ratio:9/18.5;background:#000;border:9px solid #2a2723;border-radius:40px;box-shadow:0 0 0 2px #3a352e,0 24px 60px rgba(0,0,0,.55);overflow:hidden}
 .phone iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
 .phone .notch{position:absolute;top:7px;left:50%;width:62px;height:16px;margin-left:-31px;background:#000;border-radius:999px;z-index:2;pointer-events:none}
+.vid{position:relative;aspect-ratio:16/9;background:#000;border-radius:8px;overflow:hidden}
+.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .pcap{margin-top:20px;text-align:center;font-size:14px;color:var(--mute)}
 .pcap a{color:var(--gold);font-weight:600}
 .hire-fab{display:none}
@@ -276,7 +272,6 @@ select option{background:#161513;color:#f2eee6}
 .rv h2::after{content:"";display:block;width:56px;height:2px;margin-top:16px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .9s .25s cubic-bezier(.2,.7,.2,1)}
 .rv.in h2::after{transform:scaleX(1)}
 .rv.rvd{transition:border-color .2s,transform .25s,opacity .2s,background .25s}
-.card{position:relative}
 .card.rv.in:hover{transform:translateY(-4px)}
 .card .cv,.card .thumb.vert .fg{transition:transform .8s cubic-bezier(.2,.7,.2,1)}
 .card:hover .cv,.card:hover .thumb.vert .fg{transform:scale(1.06)}
@@ -294,13 +289,23 @@ dialog[open]{animation:dpop .3s cubic-bezier(.2,.8,.2,1)}
 dialog[open]::backdrop{animation:dfade .3s}
 .viewer img{animation:vfade .35s}
 @media(max-width:680px){.hero::before{width:420px;height:420px;right:-160px;top:-100px}.hero::after{width:340px;height:340px}.mq-g span{font-size:20px;gap:28px;padding-right:28px}}
+/* base refinements */
+html{color-scheme:dark;-webkit-text-size-adjust:100%}
+::selection{background:rgba(201,169,110,.3)}
+a,button{-webkit-tap-highlight-color:transparent}
+main:focus{outline:none}
+.skip{position:absolute;left:16px;top:-64px;z-index:100;padding:10px 18px;border-radius:8px;background:var(--gold);color:#17130c;font-weight:700;transition:top .2s}
+.skip:focus{top:14px}
+.card{display:flex;flex-direction:column}
+.card .info{flex:1;display:flex;flex-direction:column}
+.card .tags{margin-top:auto;padding-top:14px}
 .rv{opacity:0;transform:translateY(18px);transition:opacity .7s,transform .7s}
 .rv.in{opacity:1;transform:none}
 
 @media(max-width:960px){
  section{padding:80px 0}
  .svc{grid-template-columns:1fr 1fr}
- .work{grid-template-columns:1fr 1fr}.card,.card.wide{grid-column:span 1}
+ .work{grid-template-columns:1fr 1fr}.card{grid-column:span 1}
  .steps{grid-template-columns:1fr 1fr}
  .about,.contact{grid-template-columns:1fr;gap:48px}
 }
@@ -322,9 +327,10 @@ dialog[open]::backdrop{animation:dfade .3s}
 <body>
 
 <div id="prog" aria-hidden="true"></div>
-<nav>
+<a class="skip" href="#main">Skip to content</a>
+<nav aria-label="Primary">
  <div class="wrap">
-  <a href="#" class="logo">Vidhan <i>Sai</i></a>
+  <a href="#" class="logo" aria-label="Vidhan Sai, back to top">Vidhan <i>Sai</i></a>
   <button class="burger" id="bg" aria-label="Toggle menu" aria-expanded="false">☰</button>
   <ul class="links" id="lk">
    <li><a href="#services">Services</a></li>
@@ -336,6 +342,7 @@ dialog[open]::backdrop{animation:dfade .3s}
  </div>
 </nav>
 
+<main id="main" tabindex="-1">
 <header class="hero">
  <div class="hbg" aria-hidden="true"></div>
  <div class="wrap">
@@ -378,8 +385,8 @@ dialog[open]::backdrop{animation:dfade .3s}
    <p class="lead">Same footage, before and after. Drag the slider to compare.</p>
    <div class="gtabs" id="gt"></div>
    <div class="ba" id="ba">
-    <img class="af" id="baA" alt="After color grade" draggable="false" width="1600" height="900" loading="lazy" decoding="async">
-    <img class="bf" id="baB" alt="Before color grade" draggable="false" width="1600" height="900" loading="lazy" decoding="async">
+    <img class="af" id="baA" src="grading/grade-01-after.webp" alt="After color grade" draggable="false" width="1600" height="900" loading="lazy" decoding="async">
+    <img class="bf" id="baB" src="grading/grade-01-before.webp" alt="Before color grade" draggable="false" width="1600" height="900" loading="lazy" decoding="async">
     <span class="tg l">Before</span><span class="tg r">After</span>
     <div class="ln"><i></i></div>
     <input type="range" id="baR" min="0" max="100" value="50" aria-label="Before and after comparison slider">
@@ -394,7 +401,7 @@ dialog[open]::backdrop{animation:dfade .3s}
   <div class="head rv"><h2>Selected work</h2><p class="lead">Documentaries, social content and design work from the last two years.</p></div>
   <div class="gtabs" id="wf" role="group" aria-label="Filter projects" style="margin:0 0 28px"><button type="button" data-f="all" aria-pressed="true">All</button><button type="button" data-f="video" aria-pressed="false">Video</button><button type="button" data-f="thumbs" aria-pressed="false">Thumbnails</button></div>
   <div class="work">
-   <a class="card rv" data-cat="video" href="#" data-soon="This documentary trailer is currently in production. Check back soon."><div class="thumb"><span class="bd gold">In production</span></div><div class="info"><h3>3D Documentary Trailer</h3><p>Documentary · 2026</p><div class="tags"><span>Video editing</span><span>3D</span></div></div></a>
+   <a class="card rv" data-cat="video" href="https://youtu.be/GO4qzd4AKrI" data-video="GO4qzd4AKrI" target="_blank" rel="noopener"><div class="thumb"><img class="cv" src="https://i.ytimg.com/vi/GO4qzd4AKrI/maxresdefault.jpg" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/GO4qzd4AKrI/mqdefault.jpg'" alt="" loading="lazy" decoding="async" width="1280" height="720"><span class="bd">▶ Watch trailer</span></div><div class="info"><h3>3D Documentary Trailer</h3><p>Documentary · 2026</p><div class="tags"><span>Video editing</span><span>3D</span></div></div></a>
    <a class="card rv" data-cat="video" data-reels href="https://www.youtube.com/playlist?list=PLLJrMvQaF-nE" target="_blank" rel="noopener"><div class="thumb vert"><img class="bgb" src="thumbnails/reels-01.webp" alt="" loading="lazy" decoding="async" width="670" height="1080"><img class="fg" src="thumbnails/reels-01.webp" alt="Frame from a financial short-form reel" loading="lazy" decoding="async" width="670" height="1080"><span class="bd">▶ Watch reels</span></div><div class="info"><h3>Financial Short-Form Reels</h3><p>Visual storytelling · 2026</p><div class="tags"><span>Short-form</span><span>Color grading</span></div></div></a>
    <a class="card rv" data-cat="video" href="https://www.youtube.com/watch?v=eJJQ7VeFvxY&amp;list=PLJKrJpf0M_MxYNKAFmTfVRR9ppIie2Cnv" target="_blank" rel="noopener"><div class="thumb img"><img class="cv" src="thumbnails/vlog-03.webp" alt="" loading="lazy" decoding="async" width="1280" height="720"><span class="bd">▶ Watch on YouTube</span></div><div class="info"><h3>Educational YouTube Content</h3><p>Vlogs · 2025</p><div class="tags"><span>Editing</span><span>Storytelling</span></div></div></a>
    <a class="card rv" data-cat="thumbs" href="#" data-gallery="vlog"><div class="thumb img"><img class="cv" src="thumbnails/vlog-04.webp" alt="" loading="lazy" decoding="async" width="1280" height="720"><span class="bd" data-count="vlog"></span></div><div class="info"><h3>Educational Vlog Thumbnails</h3><p>Thumbnail design · 2025</p><div class="tags"><span>Composition</span><span>Thumbnails</span></div></div></a>
@@ -449,7 +456,7 @@ dialog[open]::backdrop{animation:dfade .3s}
    <label for="e">Email</label><input id="e" type="email" name="email" required autocomplete="email">
    <label for="p">Project type</label><input id="p" name="project" placeholder="Brand video, reel, thumbnails…">
    <div class="row2">
-    <div><label for="fb">Budget</label><select id="fb" name="budget"><option value="">Select (optional)</option><option>Under ₹2000</option><option>₹2000 – ₹10000</option><option>₹10,000 – ₹35,000</option><option>₹50,000+</option><option>Not sure yet</option></select></div>
+    <div><label for="fb">Budget</label><select id="fb" name="budget"><option value="">Select (optional)</option><option>Under ₹2,000</option><option>₹2,000 – ₹10,000</option><option>₹10,000 – ₹35,000</option><option>₹35,000 – ₹50,000</option><option>₹50,000+</option><option>Not sure yet</option></select></div>
     <div><label for="ft">Timeline</label><select id="ft" name="timeline"><option value="">Select (optional)</option><option>Within a day</option><option>1–3 days</option><option>1 week</option><option>Flexible</option></select></div>
    </div>
    <label for="m">Details</label><textarea id="m" name="message" placeholder="Goals, deadline, references…" required></textarea>
@@ -467,6 +474,7 @@ dialog[open]::backdrop{animation:dfade .3s}
   </div>
  </div>
 </section>
+</main>
 
 <footer>
  <div class="wrap fgrid">
@@ -486,6 +494,8 @@ dialog[open]::backdrop{animation:dfade .3s}
 </dialog>
 
 <script>
+(() => {
+'use strict';
 const dlg=document.getElementById('dlg'),dt=document.getElementById('dt'),db=document.getElementById('db');
 /* Add your thumbnail file paths here, e.g. 'thumbnails/vlog-12.webp' */
 const G={
@@ -493,9 +503,7 @@ const G={
  football:{title:'Football Watchalong Thumbnails',imgs:['thumbnails/football-01.webp','thumbnails/football-02.webp','thumbnails/football-03.webp','thumbnails/football-04.webp']},
  gaming:{title:'Gaming Stream Thumbnails',imgs:['thumbnails/gaming-06.webp','thumbnails/gaming-01.webp','thumbnails/gaming-02.webp','thumbnails/gaming-03.webp','thumbnails/gaming-04.webp','thumbnails/gaming-05.webp','thumbnails/gaming-07.webp','thumbnails/gaming-08.webp','thumbnails/gaming-09.webp','thumbnails/gaming-10.webp','thumbnails/gaming-11.webp','thumbnails/gaming-12.webp','thumbnails/gaming-13.webp']}
 };
-let cur=null,idx=0,mode='soon',opener=null;
-const soon=(t,m)=>{mode='soon';dt.textContent=t;db.innerHTML='<div class="soon"><div class="mini" aria-hidden="true"><i style="flex:3"></i><i class="g" style="flex:2"></i><i style="flex:4"></i><i class="g" style="flex:3"></i><i style="flex:2"></i></div><b>Coming soon</b><p></p><a class="btn btn-p" href="https://www.youtube.com/@Sona_Edits" target="_blank" rel="noopener">Follow on YouTube for the premiere</a></div>';db.querySelector('p').textContent=m;dlg.showModal()};
-document.querySelectorAll('[data-soon]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();opener=a;soon(a.querySelector('h3').textContent,a.dataset.soon)}));
+let cur=null,idx=0,mode='grid',opener=null;
 const grid=()=>{mode='grid';dt.textContent=cur.title;db.innerHTML='<div class="gal">'+cur.imgs.map((s,i)=>'<button type="button" data-i="'+i+'" aria-label="View image '+(i+1)+'"><img src="'+s+'" alt="'+cur.title+' '+(i+1)+'" loading="lazy" decoding="async" width="1280" height="720"></button>').join('')+'</div>'};
 const view=i=>{
  const n=cur.imgs.length;idx=(i+n)%n;mode='view';const src=cur.imgs[idx];
@@ -505,7 +513,6 @@ const view=i=>{
 };
 document.querySelectorAll('[data-gallery]').forEach(a=>a.addEventListener('click',e=>{
  e.preventDefault();opener=a;const g=G[a.dataset.gallery];
- if(!g.imgs.length){soon(g.title,'Thumbnails for this project are being added. Check back soon.');return}
  cur=g;grid();dlg.showModal();
 }));
 db.addEventListener('click',e=>{
@@ -560,12 +567,20 @@ const GR=[
  tb.onclick=()=>scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
  upd();
 })();
+const localFallback=url=>{db.innerHTML='<div class="soon"><b>Plays once the site is online</b><p>YouTube blocks embedded players on a page opened straight from your computer, which causes the "player configuration error". On the live website the video plays right here.</p><a class="btn btn-p" href="'+url+'" target="_blank" rel="noopener">Watch on YouTube</a></div>';dlg.showModal()};
+document.querySelectorAll('[data-video]').forEach(a=>a.addEventListener('click',e=>{
+ e.preventDefault();opener=a;mode='video';const t=a.querySelector('h3').textContent;dt.textContent=t;
+ if(location.protocol==='file:'){localFallback(a.href);return}
+ db.innerHTML='<div class="vid"><iframe src="https://www.youtube-nocookie.com/embed/'+a.dataset.video+'?autoplay=1&rel=0&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><p class="pcap">Video not playing? <a href="'+a.href+'" target="_blank" rel="noopener">Watch it on YouTube ↗</a></p>';
+ db.querySelector('iframe').title=t;dlg.showModal();
+}));
 const REELS={list:'PLLJrMvQaF-nE',ids:[],url:'https://www.youtube.com/playlist?list=PLLJrMvQaF-nE'};
 document.querySelectorAll('[data-reels]').forEach(a=>a.addEventListener('click',e=>{
  e.preventDefault();opener=a;mode='reels';dt.textContent='Financial Short-Form Reels';
+ if(location.protocol==='file:'){localFallback(REELS.url);return}
  const src=id=>'https://www.youtube-nocookie.com/embed/'+(id?id+'?':'videoseries?list='+REELS.list+'&')+'rel=0&playsinline=1';
  const ph=(REELS.ids.length?REELS.ids:[null]).map(id=>'<div class="phone"><i class="notch"></i><iframe src="'+src(id)+'" title="Financial short-form reels" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>').join('');
- db.innerHTML='<div class="phones">'+ph+'</div><p class="pcap">Play the reels right here, or <a href="'+REELS.url+'" target="_blank" rel="noopener">open the playlist on YouTube ↗</a></p>';
+ db.innerHTML='<div class="phones">'+ph+'</div><p class="pcap">Reels not playing? <a href="'+REELS.url+'" target="_blank" rel="noopener">Open the playlist on YouTube ↗</a></p>';
  dlg.showModal();
 }));
 dlg.addEventListener('close',()=>{db.innerHTML='';if(opener){opener.focus();opener=null}});
@@ -632,6 +647,8 @@ f.addEventListener('submit',async e=>{
  }catch{fail('Network error.')}
 });
 document.getElementById('again').onclick=()=>{done.hidden=true;f.hidden=false;f.elements['name'].focus()};
+})();
 </script>
 </body>
 </html>
+
